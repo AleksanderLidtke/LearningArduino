@@ -1,5 +1,5 @@
 int PIN_NO = 10; // Pin to which the MOSFET is connected.
-int DURATION = 500; // How long the wait at a given level of current going through the LED, ms.
+int DURATION = 50; // How long the wait at a given level of current going through the LED, ms.
 int FULL_CURRENT_DURATION = 1000; // How long to keep the current at the highest value.
 int PAUSE_DURATION = 500; // How much time to wait between consecutive ramp ups of current, ms.
 
@@ -13,6 +13,8 @@ void setup(void)
 void loop(void)
 {
   /* Called repeatedly whilst Arduino is active. */
+  //analogWrite(PIN_NO, 255); //DEBUG: use this to run current through all the time.
+  
   for(int level=0; level<256; level++) // Gradually ramp up the current going through the diode by 
   {
     analogWrite(PIN_NO, level); // Set the pin a bit higher...
