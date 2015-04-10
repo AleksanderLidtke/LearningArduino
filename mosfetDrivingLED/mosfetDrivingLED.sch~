@@ -58,9 +58,9 @@ AREF
 N 47100 44200 49500 44200 4
 N 49500 44200 49500 44300 4
 T 51200 40900 8 10 1 1 0 0 1
-TITLE=Single LED driven by setting a pin high
+TITLE=A n-type power mosfet driving a LED
 T 50000 40400 8 10 1 1 0 0 1
-FILE=singleLED
+FILE=mosfetDrivingLED
 T 51500 40100 8 10 1 1 0 0 1
 PAGES=1
 T 50000 40100 8 10 1 1 0 0 1
