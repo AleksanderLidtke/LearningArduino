@@ -1,30 +1,25 @@
 # -*- coding: utf-8 -*-
 
 import sys, serial, time
+import numpy as np
 
-def send(cmd, port):
-    for char in cmd:
-        port.write(char)
-        print "sent", char
-
-arduinoSerial=serial.Serial('/dev/ttyACM4', 19200)#, timeout = 2)
+arduinoSerial=serial.Serial('/dev/ttyACM0', 19200)
 
 if not arduinoSerial.readable():
     raise IOError("Arduino isn't readable! Check the connection.")
     sys.exit()
 
-#send('/a,',arduinoSerial)
-arduinoSerial.write('$a!')
-#arduinoSerial.write('a')
-#arduinoSerial.write(',')
-#ledHigh = '1'
-#ledLow = '0'
+inputStartChar = '>'
+inputEndChar = ';'
+dataDelimiter = ','
 
-#while True:
-#    arduinoSerial.write(ledHigh)
-#    arduinoSerial.write(b'/')
-#    time.sleep(1)
-#    arduinoSerial.write(ledLow)
-#    arduinoSerial.write(b'/')
-#    time.sleep(1)
-#    print "Done loop"
+t = 0
+
+while True:
+    # compute the angle demand
+    delta = np.sin(2.0*np.pi*0.05*t) * 90+90
+    print delta
+    
+    arduinoSerial.write(inputStartChar + 'deltaServo' + dataDelimiter + str(delta) + inputEndChar)
+    time.sleep(1)
+    t += 1
