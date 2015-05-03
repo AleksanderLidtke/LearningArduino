@@ -43,7 +43,9 @@ class realTimePlot(object):
     Create the plot using the constructor and then call the update method whenever
     new set of data is available.
     """
-    def __init__(self,timeExtent, signalName, nPtAv = -1, figName = [], embeded = False):
+    def __init__(self,timeExtent, signalName, nPtAv = -1, figName = [], figSize = (6,5),
+                 margins=[0.1,0.98,0.95,0.25],embeded = False, dataLineStyle = 'k-',
+                ywindowMargin = 0.1):
         """ Parameters
         --------------
             @param timeExtent - width of the time trace being shown [s]
@@ -52,12 +54,21 @@ class realTimePlot(object):
                 applied to the data; leave -1 to disable (default)
             @param figName - (optional) name of the figure window, same as
                 signalName by default
+            @param figSize - (optional) size of the Figure, default (6,5)
+            @param margins - (optional) margins of the adjust_subplot() method,
+                default [0.1,0.98,0.95,0.25] (left, right, top, bottom)
             @param embeded - (optional) whether plot is embeded in a gui or
                 elsewhere - will not call pyplot.show() at the end of __init__;
                 default False for stand-alone running
+            @param dataLineStyle - (optional) line style and colour, def. 'k-'
+            @param ywindowMaring - (optional) adjust y-axis extents using the
+                specified fraction of the mean value of the signal, def. 0.1
         """
+        self.margins = margins
         self.timeExtent = timeExtent
         self.signalName = signalName
+        self.dataLineStyle = dataLineStyle
+        self.ywindowMargin = ywindowMargin
         self.nPtAv = nPtAv
         if len(figName) > 0:
             self.figName = figName
@@ -65,10 +76,8 @@ class realTimePlot(object):
             self.figName = signalName
         
         # disable the legend and set a small top margin
-        if self.nPtAv < 0:
-            self.topMargin = 0.95
-        else:
-            self.topMargin = 0.88
+        if self.nPtAv >= 0:
+            self.margins[2] = 0.88
             
         # default font and line controls
         self.labelfontsize = 16
@@ -79,8 +88,8 @@ class realTimePlot(object):
         matplotlib.rc('ytick', labelsize=self.labelfontsize)
         
         # create the plot axes, set up labels, etc.
-        self.fig, self.ax = plt.subplots(figsize=(9,5))
-        plt.subplots_adjust(left=0.1, right=0.98, top=self.topMargin, bottom=0.25)
+        self.fig, self.ax = plt.subplots(figsize=figSize)
+        plt.subplots_adjust(left=self.margins[0], right=self.margins[1], top=self.margins[2], bottom=self.margins[3])
         self.fig.canvas.set_window_title(self.figName)
         self.ax.tick_params(axis='both',reset=False,which='both',
                             length=self.ticklength,width=self.borderlinewidth)
@@ -159,22 +168,30 @@ class realTimePlot(object):
                         self.yplot = self.yplot[i:] + [self.datay[-1]]
                         twindow = ((self.tplot[0],self.tplot[-1]))
                         break
-            
+
             # relative time w.r.t. the last measured data point
             trel = [(v-self.tplot[-1]) for v in self.tplot]
     
             # at the beginning of the sampling period need to avoid having a zero-length y-axis
+            self.ax.get_yaxis().get_major_formatter().set_useOffset(False)
+
             if len(self.datat) == 1:
                 ywindow = ((self.datay[0]-1,self.datay[0]+1))
+            # check if the data itself is not a stream of zeroes
+            elif (np.abs(min(self.yplot)-max(self.yplot)) < 1e-6) and np.abs(min(self.yplot)) < 1e-6:
+                self.ax.get_yaxis().get_major_formatter().set_useOffset(True)
+                ywindow = ((-1e-3-self.ywindowMargin*np.abs(min(self.yplot)),
+                            1e-3+self.ywindowMargin*np.abs(max(self.yplot))))
             else:
-                ywindow = ((min(self.yplot),max(self.yplot)))
+                ywindow = ((min(self.yplot)-self.ywindowMargin*np.abs(np.mean(self.yplot)),
+                            max(self.yplot)+self.ywindowMargin*np.abs(np.mean(self.yplot))))
             
             # remove the line from previous iteration - do it just before plotting
             # the new one to keep things smooth for the eye
             self.line.pop(0).remove()
             
             # plot the line and set axes extents
-            self.line = self.ax.plot(self.tplot,self.yplot,'k',linewidth=self.plotlinewidth)
+            self.line = self.ax.plot(self.tplot,self.yplot,self.dataLineStyle,linewidth=self.plotlinewidth)
             self.ax.set_xlim(twindow)
             self.ax.set_ylim(ywindow)
             
@@ -197,12 +214,19 @@ class realTimePlot(object):
                 self.reltimeax.set_xlim((twindow[0]-self.tplot[-1],twindow[-1]-self.tplot[-1]))
             
             # update the plot
-            plt.draw()
+            self.fig.canvas.draw()
             
             # update the qt GUI if necessary and wait for the next set of data
             if SPYDER: QApplication.processEvents()
             
         except Exception as e: print type(e).__name__,':',e
+    
+    def flush(self):
+        """ Clear all stored data and prepare to re-accept a new stream of information """
+        self.datat,self.datay,self.tplot,self.yplot = [],[],[],[]
+        self.line.pop(0).remove()
+        self.line,self.lineNpt = self.ax.plot([],'k-'),self.ax.plot([],'r-')
+        self.fig.canvas.draw()
 
 #=======================
 # VALIDATION - ONLY USED WHEN THIS FILE IS EXECUTED AS A STANDALONE SCRIPT
