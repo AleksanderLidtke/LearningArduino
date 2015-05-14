@@ -2,6 +2,8 @@
 
 int x = 0; // Variable that will be transmitted.
 
+// connect GND to GND, A4 to A4 (SDA), and A5 to A5 (SCL)
+
 void setup(void)
 {
 	/* Called when Arduino starts up. */
@@ -16,6 +18,6 @@ void loop(void)
 	Wire.endTransmission(); // Stop transmitting the message.
 	x++; // Change the message.
 	
-	delay(10000);
+	delay(5000);
 }
   
