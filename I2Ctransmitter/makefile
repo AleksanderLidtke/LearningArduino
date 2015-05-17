@@ -5,4 +5,5 @@ BOARD_TAG     = pro5v328
 ARDUINO_PORT  = /dev/ttyUSB0
 ARDUINO_LIBS  = Wire
 
-include /home/alek/ArduinoMakefile/Arduino.mk
+#include /home/alek/ArduinoMakefile/Arduino.mk
+include /home/artur/Arduino-Makefile/Arduino.mk
