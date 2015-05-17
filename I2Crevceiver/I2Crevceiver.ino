@@ -34,6 +34,8 @@ int status = 0;
 void receiveEvent(int howMany)
 /* Function that executes whenever data is received from master over the I2C bus.
 	This function is registered as an event, see setup().
+	When this kicks in the main loop will pause. Then this will execute and, when
+	this method is finished, the main loop will resume where it left off.
 */
 {
 	while(1 < Wire.available()) // Loop through all but the last part of the message.
