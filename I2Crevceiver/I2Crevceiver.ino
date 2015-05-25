@@ -15,7 +15,7 @@ void setup(void)
 	Wire.onReceive(receiveEvent); // Register event listener.
 	Serial.begin(9600); // Start serial to show the stuff received over I2C there.
 
-        pinMode(ledPinBlinking, OUTPUT);
+    pinMode(ledPinBlinking, OUTPUT);
 }
 
 void loop(void)
@@ -23,10 +23,10 @@ void loop(void)
 	/* Called repeatedly whilst Arduino is active. */
 	Serial.print("Started main loop ... ");
 	delay(100); // Just keep shining
-        /*digitalWrite(ledPinBlinking, HIGH);
-        delay(20000);
-        digitalWrite(ledPinBlinking, LOW);*/
-        Serial.println("Finished main loop ...");
+    /*digitalWrite(ledPinBlinking, HIGH);
+    delay(20000);
+    digitalWrite(ledPinBlinking, LOW);*/
+    Serial.println("Finished main loop ...");
 }
 
 int status = 0;
@@ -34,6 +34,8 @@ int status = 0;
 void receiveEvent(int howMany)
 /* Function that executes whenever data is received from master over the I2C bus.
 	This function is registered as an event, see setup().
+	When this kicks in the main loop will pause. Then this will execute and, when
+	this method is finished, the main loop will resume where it left off.
 */
 {
 	while(1 < Wire.available()) // Loop through all but the last part of the message.
@@ -48,15 +50,15 @@ void receiveEvent(int howMany)
 //	(status == 0)? digitalWrite(ledPinReceived,LOW) : digitalWrite(ledPinReceived, HIGH);
 
 	// Light the LED to show that a message has been received.
-        for (int i = 0; i < 5; i++)
-        {
-            Serial.print(" ");
-            Serial.print(i);
-            digitalWrite(ledPinReceived, HIGH);
-      	    delay(100);
-      	    digitalWrite(ledPinReceived,LOW);
-            delay(100);
-        }
-        Serial.println("");
+    for (int i = 0; i < 5; i++)
+    {
+        Serial.print(" ");
+        Serial.print(i);
+        digitalWrite(ledPinReceived, HIGH);
+  	    delay(100);
+  	    digitalWrite(ledPinReceived,LOW);
+        delay(100);
+    }
+    Serial.println("");
 }
   

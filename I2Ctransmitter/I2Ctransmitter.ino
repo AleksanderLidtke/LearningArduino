@@ -14,7 +14,9 @@ void loop(void)
 {
 	/* Called repeatedly whilst Arduino is active. */
 	Wire.beginTransmission(4); // Transmit a message to device #4.
-	Wire.write( (byte)x ); // Sends one byte.
+	Wire.write( "\nsx" ); // Practice sending char arrays - will need these to distinguish telecommands.
+	Wire.write( (byte)x ); // Sends one byte with an integer.
+	Wire.write( "\n" );
 	Wire.endTransmission(); // Stop transmitting the message.
 	x++; // Change the message.
 	
