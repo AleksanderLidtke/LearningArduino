@@ -14,7 +14,7 @@ void parseMagnetometerReadings(uint8_t* rawData, float* correctedReadings)
  * @param - pointer to an array of length with corrected magnetometer readings
  * 	along X, Y, and Z axes of the magnetometer.
  */
- {
+{
  	// Combine lower and higher 8 bit magnetometer readings into 16 bit outputs.
     correctedReadings[0] = float(rawData[1]<<8 | rawData[0]);
     correctedReadings[1] = float(rawData[3]<<8 | rawData[2]);
@@ -24,7 +24,7 @@ void parseMagnetometerReadings(uint8_t* rawData, float* correctedReadings)
  	correctedReadings[0] = correctedReadings[0] * (((float(corrections[0])-128.)*0.5)/128. + 1.);
  	correctedReadings[1] = correctedReadings[1] * (((float(corrections[1])-128.)*0.5)/128. + 1.);
  	correctedReadings[2] = correctedReadings[2] * (((float(corrections[2])-128.)*0.5)/128. + 1.);
- }
+}
 
 void I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data)
 /* Read NBytes from an I2C device starting at a register at a given address. The
@@ -72,7 +72,7 @@ void setup() // Start the magnetometer and serial communications.
     I2CwriteByte(MPU9250_ADDRESS, 0x37, 0x22); // Set MPU9250 into bypass mode to access magnetometer data by writing to register INT_PIN_CFG. This is needed c.f. this post: https://github.com/kriswiner/MPU-9250/issues/3
 
 	/* Read the sensitivity correction factors supplied by the manufacturer in Read Only Memory (ROM). */
-	//I2Cread(MAG_ADDRESS,0x10,3,corrections); // Read 3 bytes starting from register 0x10 i.e. ASAX.
+	I2Cread(MAG_ADDRESS,0x10,3,corrections); // Read 3 bytes starting from register 0x10 i.e. ASAX.
 	Serial.print(">ASAX,");Serial.print(corrections[0],DEC); // Print the correction factors.
 	Serial.print(",ASAY,");Serial.print(corrections[1],DEC);
 	Serial.print(",ASAZ,");Serial.print(corrections[2],DEC);
